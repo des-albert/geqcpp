@@ -1,0 +1,2 @@
+Fortran A(i,j) =>  C++  *(a + N*(i - 1) + j - 1)
+Fortran A(i,j) => a[i-1][j - 1]
