@@ -16,7 +16,7 @@ void bndmat() {
     double ar = 2.0 / (double) Mm1;
     double r0 = 1.0 / alpha;
     double az = sh * ar;
-/* 
+/*
     Index vector interior neighbours to boundary, bottom-top
 */
 
@@ -113,7 +113,7 @@ void bndmat() {
 
 }
 
-double gfl(double rv, double rst, double zv, double del) 
+double gfl(double rv, double rst, double zv, double del)
 {
 
     double xdl;
@@ -130,7 +130,7 @@ double gfl(double rv, double rst, double zv, double del)
 }
 
 double p1(double x) {
-return (((.01736506451*x + .04757383546)*x + .06260601220)*x + .44325141463)*x + 1.0; 
+    return (((.01736506451*x + .04757383546)*x + .06260601220)*x + .44325141463)*x + 1.0;
 }
 double p2(double x) {
     return (((.00526449639*x + .04069697526)*x + .09200180037)*x + .24998368310)*x;

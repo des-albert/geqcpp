@@ -3,7 +3,7 @@ LD = g++
 
 CFLAGS = -g
 
-SOURCES = geq.cpp bndmat.cpp
+SOURCES = geq.cpp bndmat.cpp eqsil.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 
