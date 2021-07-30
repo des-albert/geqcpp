@@ -1,9 +1,9 @@
 CC = g++
 LD = g++
 
-CFLAGS = -g
+CFLAGS = -g 
 
-SOURCES = geq.cpp bndmat.cpp eqsil.cpp
+SOURCES = geq.cpp bndmat.cpp eqsil.cpp flux.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 

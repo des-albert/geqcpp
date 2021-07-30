@@ -8,9 +8,14 @@
 
 using namespace std;
 
+const int Mc = 16;
+const int Ng = 1;
+const int Nmax = 6;
+const int llmax = 16;
+
 extern void bndmat();
-extern void eqsil(double *q);
-extern double gfl(double rv, double rst, double zv, double del);
+extern void eqsil(double *);
+extern double gfl(double, double, double, double );
 
 int main() {
 
@@ -103,8 +108,8 @@ int main() {
 
     if (mprfg != 0) {
         cout << "Conductor groups available for optimization" << endl;
-        for (int j = 0; j < Mmax; k++) {
-            cout << " Group : " << k + 1 << endl;
+        for (int j = 0; j < Mmax; j++) {
+            cout << " Group : " << j + 1 << endl;
             for (int i = 0; i <= ic[j]; i++) {
                 printf(" %7.3f   %7.3f   %7.3f \n", Ra[i][j], Za[i][j], Ex[i][j]);
             }
@@ -180,13 +185,14 @@ int main() {
             }
         }
 
-        for (int i = 0; i < icl; i++) {
+        for (int i = 0; i <= icl; i++) {
             if ( ! (((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) <= 0.) && ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) <= 0.)) ) {
                 for (int l = 0; l < Nz; l += Nm1) {
                     nof = l * Mr;
                     for (int j = 0; j < Mr; j++) {
                         jn = nof + j;
                         expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[l] - Za[i][kk], 0.);
+
                     }
                 }
 
@@ -195,6 +201,7 @@ int main() {
                     for (int j = 0; j < Mr; j+= Mm1) {
                         jn = nof + j;
                         expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[l] - Za[i][kk], 0.);
+
                     }
                 }
             }

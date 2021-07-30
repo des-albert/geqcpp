@@ -4,14 +4,15 @@
 
 using namespace std;
 
-double gfl(double rv, double rst, double zv, double del);
-double k(double x, double xdl);
-double e(double x, double xdl);
+
+double gfl(double, double, double, double);
+double k(double, double);
+double e(double, double);
 
 void bndmat() {
 
-    double rt[llp];
-    double zt[llp];
+    auto *rt = new double[llp];
+    auto *zt = new double[llp];
 
     double ar = 2.0 / (double) Mm1;
     double r0 = 1.0 / alpha;
@@ -110,6 +111,10 @@ void bndmat() {
         }
 
     }
+
+    delete(rt, zt);
+
+    return;
 
 }
 
