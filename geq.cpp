@@ -15,16 +15,18 @@ const int llmax = 16;
 
 extern void bndmat();
 extern void eqsil(double *);
+extern void splnco(double *);
 extern double gfl(double, double, double, double );
+extern void condit(double *, double, double, int, double *, int, int, int);
 
 int main() {
 
     double Offset, El, Rxpsn, Zxpsn, tri, elxp, trixp, ang, al1, al2, rc1, rc2, anga, angb, ang1, ang2;
     double rac, zac, exc, Ra[Ng][Mc], Za[Ng][Mc], Ex[Ng][Mc], Rl[Ng][Mc];
-    double Rc[Nmax], Zc[Nmax], Rcc[llmax], Zcc[llmax], *expsi, *fool;
+    double Rc[Nmax], Zc[Nmax], Rcc[llmax], Zcc[llmax];
     int ic[Mc] = {};
 
-    cout << "Garching Tokamak Equlibrium" << endl;
+    cout << "Garching Tokamak Equilibrium" << endl;
 
     int Nexp = 6;
     Mr = 1 + (1 << Nexp);
@@ -171,8 +173,11 @@ int main() {
         }
     }
 
-    expsi = new double(MN);
-    fool = new double(MN);
+    auto *expsi = new double[MN];
+    auto *fool = new double[MN];
+    auto *psiext = new double[MN * Mc];
+    auto *bb = new double[Nmax * Mc];
+    auto *eb = new double[llmax * Mc];
 
     int icl, nof, jn;
     for (int kk = 0; kk < Mmax; kk++) {
@@ -202,6 +207,7 @@ int main() {
                         jn = nof + j;
                         expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[l] - Za[i][kk], 0.);
 
+
                     }
                 }
             }
@@ -209,9 +215,41 @@ int main() {
 
         eqsil(expsi);
 
+        for (int i = 0; i <= icl; i++) {
+            if ( ! (((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) > 0.) || ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) > 0.)) ) {
+                for (int l = 0; l < Nz; l++) {
+                    nof = l * Mr;
+                    for (int j = 0; j < Mr; j++) {
+                        jn = nof + j;
+                        expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[l] - Za[i][kk], 0.);
+                    }
+                }
+            }
+        }
+
+        for (int j = 0; j < MN; j++) {
+            *(psiext + MN * j + kk) = expsi[j];
+        }
+        /*
+            Computation of matrix elements for exact conditions
+        */
+
+        splnco(expsi);
+        for (int j = 0; j < Nmax; j++) {
+            condit(expsi, Rc[j], Zc[j], ityp[j], bb, j, kk, Nmax);
+        }
+        for (int j = 0; j < llmax; j++) {
+            condit(expsi, Rcc[j], Zcc[j], 1, eb, j, kk, llmax);
+        }
+
+
     }
 
 
     fin.close();
-
+    delete[] expsi;
+    delete[] fool;
+    delete[] psiext;
+    delete[] bb;
+    delete[] eb;
 }

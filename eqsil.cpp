@@ -1,12 +1,13 @@
+#include <cstdio>
 #include "geq.h"
 
 extern void flux(double *);
 
 void eqsil(double *q) {
 
-    auto *qq = new double(llp);
+    auto *qq = new double[MN];
 
-    for (int i = 0; i << llp; i++) {
+    for (int i = 0; i < MN; i++) {
         qq[i] = q[i];
     }
 
@@ -25,14 +26,14 @@ void eqsil(double *q) {
     for (int i = 0; i < llp; i++) {
         double sum = 0.;
         for (int j = 0; j < llp; j++) {
-            sum += qq[ip[j]] * aux[j,i];
+            double ax = *(aux + j * llp + i);
+            sum = sum +  ax * qq[ip[j]];
         }
-        q[jp[i]] += sum;
+        q[jp[i]] = q[jp[i]] + sum;
     }       
 
     flux(q);
 
-    delete(qq);
-    return;
+    delete[] qq;
 
 }

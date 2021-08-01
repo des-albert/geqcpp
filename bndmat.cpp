@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 double gfl(double, double, double, double);
 double k(double, double);
 double e(double, double);
@@ -40,10 +39,10 @@ void bndmat() {
         *(ip + kp + 1) = j + Nm1;
         kp += 2;
     }
-    kp += 1;
+    kp -= 1;
 
 /*
-     r - coordinates of boundary points, indexvector
+     r - coordinates of boundary points, index vector
 */
 
     double ra = r0 - 1.;
@@ -106,15 +105,14 @@ void bndmat() {
 */
         for (int j = 0; j < n2; j++) {
             *(aux + nl * llp + i) = gfl(rt[i], rt[nl], zt[i] - zt[nl], az) * sh / (rt[nl] + arh);
-            *(aux + (nl + 1) * llp + i) = gfl(rt[i], rt[nl + 1], zt[i] - zt[nl + 1], ar)* sh /(rt[nl + 1] - arh);
+            *(aux + (nl + 1) * llp + i) = gfl(rt[i], rt[nl + 1], zt[i] - zt[nl + 1], az)* sh /(rt[nl + 1] - arh);
             nl += 2;
         }
 
     }
 
-    delete(rt, zt);
-
-    return;
+    delete[] rt;
+    delete[] zt;
 
 }
 
