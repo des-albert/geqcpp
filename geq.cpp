@@ -16,9 +16,12 @@ const int llmax = 16;
 extern void bndmat();
 extern void eqsil(double *);
 extern void splnco(double *);
+extern void startt();
 extern double gfl(double, double, double, double );
 extern void condit(double *, double, double, int, double **, int, int);
+
 double ** array2d(int, int);
+void array2del(double **, int, int);
 
 int main() {
 
@@ -82,9 +85,9 @@ int main() {
 
     bndmat();
 
-/*
-    Read in Poloidal Field Coil Data
-*/
+    /*
+        Read in Poloidal Field Coil Data
+    */
 
     int k = 0;
 
@@ -101,12 +104,12 @@ int main() {
             ic[k] = ic[k] + 1;
 
         }
-L10:
+        L10:
         if (ic[k] < 1) goto L20;
         k += 1;
     }
 
-L20:
+    L20:
     int Mmax = k;
 
     if (mprfg != 0) {
@@ -280,33 +283,47 @@ L20:
         }
     }
 
+    int icops;
+    double raxis, zaxis, zdes, alp;
+
+    fin >> icops >> value;
+    int mpnmax  = Mmax + Nmax + 1;
+    if (icops >= 1) {
+        mpnmax += 1;
+    }
+
+    fin >> totcurr >> betapol >> alfac;
+    fin >> raxis >> zaxis >> zdes >> alp;
     fin.close();
+
+    jaxis = (int) floor(0.1 + (raxis - R[0]) / dr);
+    raxis = R[jaxis];
+    naxis = (int) floor(0.1 + (zaxis - Z[0]) / dz);
+    zaxis = Z[naxis];
+    ndes = (int) floor(0.1 + (abs(zdes) - Z[0]) / dz);
+    if (zdes > 0.) {
+        zdes = Z[ndes];
+    }
+
+    printf(" Magnetic Axis r = %8.3f  z = %7.3f\n", raxis, zaxis);
+    printf(" Rail Limiter  z = %8.3f  alp factor = %10.3e\n", zdes, alp);
+
+    alph = 2. * alp * pi / (llmax * raxis);
+
+    g = array2d(Mr, Nz);
+
+    startt();
+
+
     delete[] expsi;
     delete[] fool;
-    for (int i = 0; i < Mc; i++) {
-        delete[] psiext[i];
-    }
-    delete[] psiext;
 
-    for (int i = 0; i < Mc; i++) {
-        delete[] bb[i];
-    }
-    delete [] bb;
-
-    for (int i = 0; i < Mc; i++) {
-        delete[] eb[i];
-    }
-    delete[] eb;
-
-    for (int i = 0; i < Mc; i++) {
-        delete[] cl[i];
-    }
-    delete[] cl;
-
-    for (int i = 0; i < Nmax; i++) {
-        delete[] fk[i];
-    }
-    delete[] fk;
+    array2del(psiext, MN, Mc);
+    array2del(bb, Nmax, Mc);
+    array2del(eb, llmax, Mc);
+    array2del(cl, Mc + 1, Mc);
+    array2del(fk, Mc, Nmax);
+    array2del(g, Mr, Nz);
 }
 
 double ** array2d(int m, int n) {
@@ -315,4 +332,11 @@ double ** array2d(int m, int n) {
         ptr[i] = new double[n];
     }
     return ptr;
+}
+
+void array2del(double **ptr, int m, int n) {
+    for (int i = 0; i < m; i++) {
+        delete[] ptr[i];
+    }
+    delete[] ptr;
 }
