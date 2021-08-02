@@ -5,7 +5,7 @@ using namespace std;
 
 void splnco(double *psi) {
 
-    double a[4];
+    double a[8];
 
     double a1 = -4.0;
 
@@ -28,7 +28,7 @@ void splnco(double *psi) {
     int il = Mm1 - 1;
 
 L20:
-    int k = 1;
+    int k = 0;
     int jh = jh1;
     int mode = 2;
 
@@ -50,7 +50,7 @@ L30:
             goto L30;
         }
         mode = 1;
-        if (k == 5) {
+        if (k == 4) {
             jh = jh / 2;
             if (jh >= jh1)
                 goto L30;
@@ -64,7 +64,7 @@ L30:
             il = Mr* (Nm1 - 1);
             goto L20;
         }
-        k = 9 - k;
+        k = 7 - k;
         goto L30;
     }
     else {

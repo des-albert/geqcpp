@@ -35,8 +35,8 @@ void bndmat() {
 */
 
     for (int j = Mr; j <= j2; j += Mr) {
-        *(ip + kp) = j + 2;
-        *(ip + kp + 1) = j + Nm1;
+        ip[kp] = j + 2;
+        ip[kp + 1] = j + Nm1;
         kp += 2;
     }
     kp -= 1;
@@ -61,8 +61,8 @@ void bndmat() {
         rt[nl + 1] = rt[nl];
         zt[nl] = za;
         zt[nl + 1] = zb;
-        *(jp + nl) = i + 1;
-        *(jp + nl + 1) = i + 1 + j2;
+        jp[nl] = i + 1;
+        jp[nl + 1] = i + 1 + j2;
         nl += 2;
     }
 
@@ -76,8 +76,8 @@ void bndmat() {
         rt[nl + 1] = rb;
         zt[nl] = az * (double) j;
         zt[nl + 1] = zt[nl - 1];
-        *(jp + nl) = j * Mr + 1;
-        *(jp + nl + 1) = (j + 1) * Mr;
+        jp[nl] = j * Mr + 1;
+        jp[nl + 1] = (j + 1) * Mr;
         nl += 2;
     }
 
@@ -96,16 +96,16 @@ void bndmat() {
 
         nl = 0;
         for (int j = 0; j < m2; j++) {
-            *(aux + nl * llp + i) = gfl(rt[i], rt[nl], zt[i] - zt[nl], ar) / (sh * rt[nl]);
-            *(aux + (nl + 1) * llp + i) = gfl(rt[i], rt[nl + 1], zt[i] - zt[nl + 1], ar)/ (sh * rt[nl + 1]);
+            aux[nl][i] = gfl(rt[i], rt[nl], zt[i] - zt[nl], ar) / (sh * rt[nl]);
+            aux[nl + 1][i] = gfl(rt[i], rt[nl + 1], zt[i] - zt[nl + 1], ar)/ (sh * rt[nl + 1]);
             nl += 2;
         }
 /*
     Left - Right
 */
         for (int j = 0; j < n2; j++) {
-            *(aux + nl * llp + i) = gfl(rt[i], rt[nl], zt[i] - zt[nl], az) * sh / (rt[nl] + arh);
-            *(aux + (nl + 1) * llp + i) = gfl(rt[i], rt[nl + 1], zt[i] - zt[nl + 1], az)* sh /(rt[nl + 1] - arh);
+            aux[nl][i] = gfl(rt[i], rt[nl], zt[i] - zt[nl], az) * sh / (rt[nl] + arh);
+            aux[nl + 1][i] = gfl(rt[i], rt[nl + 1], zt[i] - zt[nl + 1], az)* sh /(rt[nl + 1] - arh);
             nl += 2;
         }
 

@@ -26,8 +26,7 @@ void eqsil(double *q) {
     for (int i = 0; i < llp; i++) {
         double sum = 0.;
         for (int j = 0; j < llp; j++) {
-            double ax = *(aux + j * llp + i);
-            sum = sum +  ax * qq[ip[j]];
+            sum = sum +  aux[j][i] * qq[ip[j]];
         }
         q[jp[i]] = q[jp[i]] + sum;
     }       

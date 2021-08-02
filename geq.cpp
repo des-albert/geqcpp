@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int Mc = 16;
+const int Mc = 15;
 const int Ng = 1;
 const int Nmax = 6;
 const int llmax = 16;
@@ -17,7 +17,8 @@ extern void bndmat();
 extern void eqsil(double *);
 extern void splnco(double *);
 extern double gfl(double, double, double, double );
-extern void condit(double *, double, double, int, double *, int, int, int);
+extern void condit(double *, double, double, int, double **, int, int);
+double ** array2d(int, int);
 
 int main() {
 
@@ -56,8 +57,9 @@ int main() {
     Z = new double[Nz];
     ip = new int[llp];
     jp = new int[llp];
-    ityp = new int[6];
-    aux = new double[llp * llp];
+    ityp = new int[Nmax];
+
+    aux = array2d(llp, llp);
 
 
     dr = (Rmax - Rmin) / (double) Mm1;
@@ -87,32 +89,31 @@ int main() {
     int k = 0;
 
     while (true) {
-        ic[k] = -1;
+        ic[k] = 0;
         while (true) {
             fin >> rac >> zac >> exc;
-
             if (rac <= 0.0) goto L10;
-            ic[k] = ic[k] + 1;
+
             Ra[ic[k]][k] = rac;
             Za[ic[k]][k] = zac;
             Ex[ic[k]][k] = exc;
             Rl[ic[k]][k] = 1.0e-20 * rac;
+            ic[k] = ic[k] + 1;
 
-            k += 1;
         }
-
-        L10:
-        if (ic[k] < 0) goto L20;
+L10:
+        if (ic[k] < 1) goto L20;
+        k += 1;
     }
 
-    L20:
+L20:
     int Mmax = k;
 
     if (mprfg != 0) {
         cout << "Conductor groups available for optimization" << endl;
         for (int j = 0; j < Mmax; j++) {
             cout << " Group : " << j + 1 << endl;
-            for (int i = 0; i <= ic[j]; i++) {
+            for (int i = 0; i < ic[j]; i++) {
                 printf(" %7.3f   %7.3f   %7.3f \n", Ra[i][j], Za[i][j], Ex[i][j]);
             }
         }
@@ -131,13 +132,13 @@ int main() {
         Zc[j] = Zxpsn;
     }
 
-    ityp[3] = 1;
+    ityp[3] = 0;
     Rc[3] = Rmpl - Apl;
     Zc[3] = Offset;
-    ityp[4] = 1;
+    ityp[4] = 0;
     Rc[4] = Rmpl + Apl;
     Zc[4] = Offset;
-    ityp[5] = 1;
+    ityp[5] = 0;
     Rc[5] = Rmpl - Apl * tri;
     Zc[5] = Offset + Apl * El;
 
@@ -175,9 +176,11 @@ int main() {
 
     auto *expsi = new double[MN];
     auto *fool = new double[MN];
-    auto *psiext = new double[MN * Mc];
-    auto *bb = new double[Nmax * Mc];
-    auto *eb = new double[llmax * Mc];
+    double **psiext = array2d(MN, Mc);
+    bb = array2d(Nmax, Mc);
+    eb = array2d(llmax, Mc);
+    cl = array2d(Mc + 1, Mc);
+    fk = array2d(Mc, Nmax);
 
     int icl, nof, jn;
     for (int kk = 0; kk < Mmax; kk++) {
@@ -190,7 +193,7 @@ int main() {
             }
         }
 
-        for (int i = 0; i <= icl; i++) {
+        for (int i = 0; i < icl; i++) {
             if ( ! (((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) <= 0.) && ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) <= 0.)) ) {
                 for (int l = 0; l < Nz; l += Nm1) {
                     nof = l * Mr;
@@ -228,7 +231,7 @@ int main() {
         }
 
         for (int j = 0; j < MN; j++) {
-            *(psiext + MN * j + kk) = expsi[j];
+            psiext[j][kk] = expsi[j];
         }
         /*
             Computation of matrix elements for exact conditions
@@ -236,20 +239,80 @@ int main() {
 
         splnco(expsi);
         for (int j = 0; j < Nmax; j++) {
-            condit(expsi, Rc[j], Zc[j], ityp[j], bb, j, kk, Nmax);
+            condit(expsi, Rc[j], Zc[j], ityp[j], bb, j, kk);
         }
         for (int j = 0; j < llmax; j++) {
-            condit(expsi, Rcc[j], Zcc[j], 1, eb, j, kk, llmax);
+            condit(expsi, Rcc[j], Zcc[j], 0, eb, j, kk);
         }
 
+        /*
+            Computation of inductances
+        */
 
+
+        cl[kk][kk] = 0.;
+        cl[Mmax][kk] = 0;
+
+        for (int i = 0; i < icl; i++) {
+            cl[Mmax][kk] += Ex[i][kk];
+            cl[kk][kk]  += Ex[i][kk]*Ex[i][kk] * 1.0e6 *(0.58 + log(Ra[i][kk]/Rl[i][kk])) / (2.0 * pi);
+        }
+
+        for (int i = 0; i < icl; i++) {
+            int ii = i + 2;
+            if (ii <= ic[kk]) {
+                for (int j = ii - 1; j < icl; j++) {
+                    cl[kk][kk] += 2. * Ex[i][kk]*Ex[j][kk] * gfl(Ra[j][kk], Ra[i][kk], Za[j][kk] - Za[i][kk], 0.);
+                }
+            }
+        }
+        int lp1 = kk + 1;
+        if ((lp1 + 1) <= Mmax) {
+            for (int l = lp1; l < Mmax; l++) {
+                int icm = ic[l];
+                cl[kk][l] = 0.;
+                for (int i = 0; i < icl; i++) {
+                    for (int j = 0; j < icm; j++) {
+                        cl[kk][l]  += Ex[i][kk]*Ex[j][l] * gfl(Ra[j][l], Ra[i][kk], Za[j][l] - Za[i][kk], 0.);
+                    }
+                }
+            }
+        }
     }
-
 
     fin.close();
     delete[] expsi;
     delete[] fool;
+    for (int i = 0; i < Mc; i++) {
+        delete[] psiext[i];
+    }
     delete[] psiext;
-    delete[] bb;
+
+    for (int i = 0; i < Mc; i++) {
+        delete[] bb[i];
+    }
+    delete [] bb;
+
+    for (int i = 0; i < Mc; i++) {
+        delete[] eb[i];
+    }
     delete[] eb;
+
+    for (int i = 0; i < Mc; i++) {
+        delete[] cl[i];
+    }
+    delete[] cl;
+
+    for (int i = 0; i < Nmax; i++) {
+        delete[] fk[i];
+    }
+    delete[] fk;
+}
+
+double ** array2d(int m, int n) {
+    auto ** ptr = new double * [m];
+    for (int i = 0; i < m; i++) {
+        ptr[i] = new double[n];
+    }
+    return ptr;
 }
