@@ -8,20 +8,21 @@
 
 using namespace std;
 
-const int Mc = 15;
-const int Ng = 1;
-const int Nmax = 6;
-const int llmax = 16;
+int Mc = 15;
+int Ng = 1;
+int Nmax = 6;
+int llmax = 16;
 
 extern void bndmat();
 extern void eqsil(double *);
 extern void splnco(double *);
 extern void startt();
+extern void compar();
+extern void xcur();
 extern double gfl(double, double, double, double );
 extern void condit(double *, double, double, int, double **, int, int);
-
 double ** array2d(int, int);
-void array2del(double **, int, int);
+void array2del(double **, int);
 
 int main() {
 
@@ -110,7 +111,7 @@ int main() {
     }
 
     L20:
-    int Mmax = k;
+    Mmax = k;
 
     if (mprfg != 0) {
         cout << "Conductor groups available for optimization" << endl;
@@ -179,11 +180,13 @@ int main() {
 
     auto *expsi = new double[MN];
     auto *fool = new double[MN];
+    fk = new double[Mc + Nmax];
     double **psiext = array2d(MN, Mc);
+
     bb = array2d(Nmax, Mc);
     eb = array2d(llmax, Mc);
     cl = array2d(Mc + 1, Mc);
-    fk = array2d(Mc, Nmax);
+
 
     int icl, nof, jn;
     for (int kk = 0; kk < Mmax; kk++) {
@@ -283,11 +286,11 @@ int main() {
         }
     }
 
-    int icops;
+    icops;
     double raxis, zaxis, zdes, alp;
 
     fin >> icops >> value;
-    int mpnmax  = Mmax + Nmax + 1;
+    mpnmax  = Mmax + Nmax + 1;
     if (icops >= 1) {
         mpnmax += 1;
     }
@@ -310,20 +313,49 @@ int main() {
 
     alph = 2. * alp * pi / (llmax * raxis);
 
-    g = array2d(Mr, Nz);
+    g = new double[Mr * Nz];
 
     startt();
 
+    com = new double[Mr];
+    icycle = 1;
+    idecis = 0;
+
+    while (icycle < 20) {
+
+        eqsil(g);
+
+        compar();
+
+        for (int j = 0; j < MN; j++) {
+            fool[j] = 0;
+            expsi[j] = g[j];
+        }
+
+        splnco(expsi);
+        for (int j = 0; j < Nmax; j++) {
+            condit(expsi, Rc[j], Zc[j], ityp[j], bb, j, Mmax);
+        }
+        for (int j = 0; j < llmax; j++) {
+            condit(expsi, Rcc[j], Zcc[j], 0, eb, j, Mmax);
+        }
+
+        xcur();
+
+
+        icycle += 1;
+    }
 
     delete[] expsi;
     delete[] fool;
+    delete[] g;
+    delete[] fk;
 
-    array2del(psiext, MN, Mc);
-    array2del(bb, Nmax, Mc);
-    array2del(eb, llmax, Mc);
-    array2del(cl, Mc + 1, Mc);
-    array2del(fk, Mc, Nmax);
-    array2del(g, Mr, Nz);
+    array2del(psiext, MN);
+    array2del(bb, Nmax);
+    array2del(eb, llmax);
+    array2del(cl, Mc + 1);
+
 }
 
 double ** array2d(int m, int n) {
@@ -334,7 +366,7 @@ double ** array2d(int m, int n) {
     return ptr;
 }
 
-void array2del(double **ptr, int m, int n) {
+void array2del(double **ptr, int m) {
     for (int i = 0; i < m; i++) {
         delete[] ptr[i];
     }
