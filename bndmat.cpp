@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cmath>
 #include "geq.h"
 
@@ -86,7 +85,6 @@ void bndmat() {
 
 */
     double arh = ar / 2.;
-    double azh = az / 2.;
 
     for (int i = 0; i < kp; i++) {
 

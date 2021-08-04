@@ -1,5 +1,4 @@
 #include "geq.h"
-#include <cstdio>
 #include <cmath>
 
 void flux(double *psi) {

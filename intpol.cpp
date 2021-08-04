@@ -1,7 +1,7 @@
 #include <cmath>
 #include "geq.h"
 
-void intpol(double *, double, double, double *);
+void intpol(const double *, double, double, double *);
 
 void condit(double *v, double rx, double zx, int itp, double **b, int i, int j) {
 
@@ -17,7 +17,7 @@ void condit(double *v, double rx, double zx, int itp, double **b, int i, int j) 
 double p(double, double, double);
 double dp(double, double, double);
 
-void intpol(double *v, double x, double y, double * w) {
+void intpol(const double *v, double x, double y, double * w) {
 
     double af[3], adf[3];
     double a1, a2;

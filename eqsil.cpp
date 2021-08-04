@@ -1,4 +1,3 @@
-#include <cstdio>
 #include "geq.h"
 
 extern void flux(double *);

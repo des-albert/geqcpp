@@ -8,11 +8,6 @@
 
 using namespace std;
 
-int Mc = 15;
-int Ng = 1;
-int Nmax = 6;
-int llmax = 16;
-
 extern void bndmat();
 extern void eqsil(double *);
 extern void splnco(double *);
@@ -29,7 +24,7 @@ int main() {
     double Offset, El, Rxpsn, Zxpsn, tri, elxp, trixp, ang, al1, al2, rc1, rc2, anga, angb, ang1, ang2;
     double rac, zac, exc, Ra[Ng][Mc], Za[Ng][Mc], Ex[Ng][Mc], Rl[Ng][Mc];
     double Rc[Nmax], Zc[Nmax], Rcc[llmax], Zcc[llmax];
-    int ic[Mc] = {};
+    int ic[Mc];
 
     cout << "Garching Tokamak Equilibrium" << endl;
 
@@ -286,7 +281,6 @@ int main() {
         }
     }
 
-    icops;
     double raxis, zaxis, zdes, alp;
 
     fin >> icops >> value;

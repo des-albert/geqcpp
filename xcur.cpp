@@ -1,18 +1,12 @@
 #include "geq.h"
 
-using namespace std;
-
 extern void gauss(double *, double **, int);
 extern double **array2d(int, int);
-extern double array2del(double **, int);
-
-extern int Nmax;
-extern int llmax;
+extern void array2del(double **, int);
 
 void xcur() {
 
     int mmaxp1 = Mmax + 1;
-    int mmaxp2 = Mmax + 2;
 
     double **ax = array2d(mpnmax, mpnmax);
     double bv[3] = {-1., 0, 0};
@@ -36,10 +30,8 @@ void xcur() {
     }
 
     ax[Mmax][Mmax] = 0.;
-    if (Nmax > 0) {
-        for (int j = 0; j < Nmax; j++) {
-            ax[Mmax][mmaxp1 + j] = bv[ityp[j]];
-        }
+    for (int j = 0; j < Nmax; j++) {
+        ax[Mmax][mmaxp1 + j] = bv[ityp[j]];
     }
 
     if (icops >= 2) {
@@ -60,18 +52,16 @@ void xcur() {
         fk[i] = 0.;
     }
 
-    if (llmax > 0 ) {
-        for (int ll = 0; ll < Mmax; ll++) {
-            for (int i = 0; i < Mmax; i++ ) {
-                for (int j = 0; j < Mmax; j++) {
-                    ax[i][j] += + 2. * alph * eb[ll][j];
-                }
-                ax[i][Mmax] -= 2. * alph * eb[ll][i];
-                fk[i] -= 2. * alph * eb[ll][Mmax];
+    for (int ll = 0; ll < Mmax; ll++) {
+        for (int i = 0; i < Mmax; i++) {
+            for (int j = 0; j < Mmax; j++) {
+                ax[i][j] += +2. * alph * eb[ll][j];
             }
-            ax[Mmax][Mmax] -= 2. * alph;
-            fk[Mmax] += 2. * alph * eb[ll][Mmax];
+            ax[i][Mmax] -= 2. * alph * eb[ll][i];
+            fk[i] -= 2. * alph * eb[ll][Mmax];
         }
+        ax[Mmax][Mmax] -= 2. * alph;
+        fk[Mmax] += 2. * alph * eb[ll][Mmax];
     }
 
     for (int i = 0; i < mpnmax; i++) {

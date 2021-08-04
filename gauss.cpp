@@ -3,29 +3,30 @@
 
 using namespace std;
 
-double ** array2d(int, int);
+double **array2d(int, int);
+
 void array2del(double **, int);
 
 void gauss(double *b, double **a, int n) {
 
-    double **aug = array2d(n, n + 1);
+    double **ag = array2d(n, n + 1);
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            aug[i][j] = a[i][j];
+            ag[i][j] = a[i][j];
         }
-        aug[i][n] = b[i];
+        ag[i][n] = b[i];
     }
 
     // Pivoting
 
     for (int i = 0; i < n; i++) {
         for (int k = i + 1; k < n; k++) {
-            if (abs(aug[i][i]) < abs(aug[k][i])) {
+            if (abs(ag[i][i]) < abs(ag[k][i])) {
                 for (int j = 0; j <= n; j++) {
-                    double temp = aug[i][j];
-                    aug[i][j] = aug[k][j];
-                    aug[k][j] = temp;
+                    double temp = ag[i][j];
+                    ag[i][j] = ag[k][j];
+                    ag[k][j] = temp;
                 }
             }
         }
@@ -35,9 +36,9 @@ void gauss(double *b, double **a, int n) {
 
     for (int i = 0; i < n - 1; i++) {
         for (int k = i + 1; k < n; k++) {
-            double temp = aug[k][i] / aug[i][i];
-            for (int j = 0; j <=n; j++) {
-                aug[k][j] = aug[k][j] - temp * aug[i][j];
+            double t = ag[k][i] / ag[i][i];
+            for (int j = 0; j <= n; j++) {
+                ag[k][j] = ag[k][j] - t * ag[i][j];
             }
         }
     }
@@ -45,15 +46,14 @@ void gauss(double *b, double **a, int n) {
     // Back substitution
 
     for (int i = n - 1; i >= 0; i--) {
-        b[i] = aug[i][n];
+        b[i] = ag[i][n];
         for (int j = i + 1; j < n; j++) {
-            if (j != i) {
-                b[i] = b[i] - aug[i][j] * b[j];
-            }
-            b[i] = b[i]/aug[i][i];
+            if (j != i)
+                b[i] = b[i] - ag[i][j] * b[j];
         }
+        b[i] = b[i] / ag[i][i];
     }
 
-    array2del(aug, n);
+    array2del(ag, n);
 }
 
