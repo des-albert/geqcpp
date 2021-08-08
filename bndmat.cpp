@@ -24,8 +24,8 @@ void bndmat() {
     int kp = 0;
 
     for (int i = 2; i <= Mm1; i++) {
-        *(ip + kp) = i + j1;
-        *(ip + kp + 1) = i + j2;
+        *(ip + kp) = i + j1 - 1;
+        *(ip + kp + 1) = i + j2 - 1;
         kp += 2;
     }
 
@@ -34,11 +34,10 @@ void bndmat() {
 */
 
     for (int j = Mr; j <= j2; j += Mr) {
-        ip[kp] = j + 2;
-        ip[kp + 1] = j + Nm1;
+        ip[kp] = j + 1;
+        ip[kp + 1] = j + Nm1 - 1;
         kp += 2;
     }
-    kp -= 1;
 
 /*
      r - coordinates of boundary points, index vector
@@ -60,8 +59,8 @@ void bndmat() {
         rt[nl + 1] = rt[nl];
         zt[nl] = za;
         zt[nl + 1] = zb;
-        jp[nl] = i + 1;
-        jp[nl + 1] = i + 1 + j2;
+        jp[nl] = i;
+        jp[nl + 1] = i + j2;
         nl += 2;
     }
 
@@ -74,9 +73,9 @@ void bndmat() {
         rt[nl] = ra;
         rt[nl + 1] = rb;
         zt[nl] = az * (double) j;
-        zt[nl + 1] = zt[nl - 1];
-        jp[nl] = j * Mr + 1;
-        jp[nl + 1] = (j + 1) * Mr;
+        zt[nl + 1] = zt[nl];
+        jp[nl] = j * Mr;
+        jp[nl + 1] = (j + 1) * Mr - 1;
         nl += 2;
     }
 
@@ -84,7 +83,7 @@ void bndmat() {
     Matrix elements
 
 */
-    double arh = ar / 2.;
+    double arh = 0.5 * ar ;
 
     for (int i = 0; i < kp; i++) {
 
@@ -126,7 +125,7 @@ double gfl(double rv, double rst, double zv, double del)
     else {
         xdl = log(x);
     }
-    return sqrt(rv * rst/ak) * ((1. - ak/2.)*k(x, xdl) - e(x, xdl)) / pi;
+    return sqrt(rv * rst/ak) * ((1. - 0.5 * ak)*k(x, xdl) - e(x, xdl)) / pi;
 
 }
 

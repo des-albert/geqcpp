@@ -25,7 +25,7 @@ void startt() {
 
     for (int j = nmin; j < njmax; j++) {
         for (int i = 0; i < 5; i ++) {
-            g[Nz * (jaxis - 2 + i) + j] = cp * (1. - pow((double)(j - naxis) / (double) (ndes - naxis), 2.0 )) * dz * dz;
+            g[(jaxis - 2 + i) + j * Mr] = cp * (1. - pow((double)(j - naxis) / (double) (ndes - naxis), 2.0 )) * dz * dz;
         }
     }
 

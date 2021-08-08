@@ -28,7 +28,7 @@ void intpol(const double *v, double x, double y, double * w) {
     int n = (int) floor(y + 0.5);
     int mni = m + n * Mr;
 
-    if ( ! (m < 0 || m > Mr - 2 || n < 0 || n > Nz -1)) {
+    if ( ! (m < 0 || m >= Mr - 2 || n < 0 || n >= Nz -1)) {
         if (n == 0) {
             for (int i = 0; i < 3; i++) {
                 int ki = mni;

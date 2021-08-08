@@ -24,11 +24,12 @@ int main() {
     double Offset, El, Rxpsn, Zxpsn, tri, elxp, trixp, ang, al1, al2, rc1, rc2, anga, angb, ang1, ang2;
     double rac, zac, exc, Ra[Ng][Mc], Za[Ng][Mc], Ex[Ng][Mc], Rl[Ng][Mc];
     double Rc[Nmax], Zc[Nmax], Rcc[llmax], Zcc[llmax];
-    int ic[Mc];
+    double raxis, zaxis, zdes, alp, xt1, xt2, xt3, curr;
+    int ic[Mc], icl, nof, jn, kk, k;
 
     cout << "Garching Tokamak Equilibrium" << endl;
 
-    int Nexp = 6;
+    int Nexp = 3;
     Mr = 1 + (1 << Nexp);
     Nz = Mr;
     MN = Mr * Nz;
@@ -85,7 +86,7 @@ int main() {
         Read in Poloidal Field Coil Data
     */
 
-    int k = 0;
+    k = 0;
 
     while (true) {
         ic[k] = 0;
@@ -183,8 +184,7 @@ int main() {
     cl = array2d(Mc + 1, Mc);
 
 
-    int icl, nof, jn;
-    for (int kk = 0; kk < Mmax; kk++) {
+    for (kk = 0; kk < Mmax; kk++) {
         icl = ic[kk];
         for (int i = 0; i < Nz; i++) {
             nof = i * Mr;
@@ -196,20 +196,20 @@ int main() {
 
         for (int i = 0; i < icl; i++) {
             if ( ! (((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) <= 0.) && ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) <= 0.)) ) {
-                for (int l = 0; l < Nz; l += Nm1) {
-                    nof = l * Mr;
+                for (int k = 0; k < Nz; k += Nm1) {
+                    nof = k * Mr;
                     for (int j = 0; j < Mr; j++) {
                         jn = nof + j;
-                        expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[l] - Za[i][kk], 0.);
+                        expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[k] - Za[i][kk], 0.);
 
                     }
                 }
 
-                for (int l = 0; l < Nz; l++) {
-                    nof = l * Mr;
+                for (int k = 0; k < Nz; k++) {
+                    nof = k * Mr;
                     for (int j = 0; j < Mr; j+= Mm1) {
                         jn = nof + j;
-                        expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[l] - Za[i][kk], 0.);
+                        expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[k] - Za[i][kk], 0.);
 
 
                     }
@@ -219,13 +219,13 @@ int main() {
 
         eqsil(expsi);
 
-        for (int i = 0; i <= icl; i++) {
+        for (int i = 0; i < icl; i++) {
             if ( ! (((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) > 0.) || ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) > 0.)) ) {
-                for (int l = 0; l < Nz; l++) {
-                    nof = l * Mr;
+                for (int k = 0; k < Nz; k++) {
+                    nof = k * Mr;
                     for (int j = 0; j < Mr; j++) {
                         jn = nof + j;
-                        expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[l] - Za[i][kk], 0.);
+                        expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[k] - Za[i][kk], 0.);
                     }
                 }
             }
@@ -256,7 +256,7 @@ int main() {
 
         for (int i = 0; i < icl; i++) {
             cl[Mmax][kk] += Ex[i][kk];
-            cl[kk][kk]  += Ex[i][kk]*Ex[i][kk] * 1.0e6 *(0.58 + log(Ra[i][kk]/Rl[i][kk])) / (2.0 * pi);
+            cl[kk][kk]  += Ex[i][kk]* Ex[i][kk] * 1.0e6 *(0.58 + log(Ra[i][kk]/Rl[i][kk])) / (2.0 * pi);
         }
 
         for (int i = 0; i < icl; i++) {
@@ -280,8 +280,6 @@ int main() {
             }
         }
     }
-
-    double raxis, zaxis, zdes, alp;
 
     fin >> icops >> value;
     mpnmax  = Mmax + Nmax + 1;
@@ -327,6 +325,7 @@ int main() {
         }
 
         splnco(expsi);
+
         for (int j = 0; j < Nmax; j++) {
             condit(expsi, Rc[j], Zc[j], ityp[j], bb, j, Mmax);
         }
@@ -336,6 +335,29 @@ int main() {
 
         xcur();
 
+        xt1 = 0.;
+        xt2 = 0.;
+        xt3 = 0.;
+
+        for (int i = 0; i < Mmax; i++) {
+            for (int j = 0; j < ic[i]; j++) {
+                curr = Ex[j][i] * fk[i];
+                xt1 += curr * curr;
+                xt2 += abs(curr);
+                xt3 += abs(curr * Ra[j][i]);
+            }
+        }
+
+        if (mprfg != 0) {
+            printf(" SIG(I**2) = %12.4f  SIG{ABS(I)) = %12.4f  SIG(ABS(RI)) = %12.4f \n",xt1,xt2,xt3);
+        }
+
+        for (k = 0; k < Mmax; k++) {
+            for (int j = 1; j < MN; j++) {
+                fool[j] += fk[k] * psiext[j][k];
+                g[j] += fk[k] * psiext[j][k];
+            }
+        }
 
         icycle += 1;
     }
