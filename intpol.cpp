@@ -6,8 +6,8 @@ void intpol(const double *, double, double, double *);
 void condit(double *v, double rx, double zx, int itp, double **b, int i, int j) {
 
     double var[3];
-    double x = (rx - Rmin)/dr;
-    double y = (zx - Zmin)/dz;
+    double x = (rx - Rmin) / dr;
+    double y = (zx - Zmin) / dz;
 
     intpol(v, x, y, var);
     b[i][j] = var[itp];
@@ -15,9 +15,10 @@ void condit(double *v, double rx, double zx, int itp, double **b, int i, int j) 
 }
 
 double p(double, double, double);
+
 double dp(double, double, double);
 
-void intpol(const double *v, double x, double y, double * w) {
+void intpol(const double *v, double x, double y, double *w) {
 
     double af[3], adf[3];
     double a1, a2;
@@ -28,7 +29,7 @@ void intpol(const double *v, double x, double y, double * w) {
     int n = (int) floor(y + 0.5);
     int mni = m + n * Mr;
 
-    if ( ! (m < 0 || m >= Mr - 2 || n < 0 || n >= Nz -1)) {
+    if (!(m < 0 || m >= Mr - 2 || n < 0 || n >= Nz - 1)) {
         if (n == 0) {
             for (int i = 0; i < 3; i++) {
                 int ki = mni;
@@ -37,8 +38,7 @@ void intpol(const double *v, double x, double y, double * w) {
                 af[i] = p(dy, a1, a2) + v[ki];
                 adf[i] = dp(dy, a1, a2);
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < 3; i++) {
                 int ki = mni + i;
                 a1 = v[ki + Mr] + v[ki - Mr] - 2.0 * v[ki];

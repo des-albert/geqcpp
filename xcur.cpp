@@ -2,18 +2,20 @@
 #include "geq.h"
 
 extern void gelg(double *, double **, int, int, double, int);
+
 extern double **array2d(int, int);
+
 extern void array2del(double **, int);
 
 void xcur() {
 
     int mmaxp1 = Mmax + 1;
     double bv[3] = {-1., 0, 0};
-    int i,j;
+    int i, j;
 
     double **ax = array2d(mpnmax, mpnmax);
 
-    for (i = 0; i < Mmax; i ++) {
+    for (i = 0; i < Mmax; i++) {
         for (j = i; j < Mmax; j++) {
             ax[i][j] = cl[i][j];
         }
@@ -24,8 +26,7 @@ void xcur() {
         if (icops >= 2) {
             if (icops > 2) {
                 ax[i][mpnmax - 1] = 0.;
-            }
-            else {
+            } else {
                 ax[i][mpnmax - 1] = cl[Mmax][i];
             }
         }
@@ -39,8 +40,7 @@ void xcur() {
     if (icops >= 2) {
         if (icops > 2) {
             ax[Mmax][mpnmax - 1] = 1.;
-        }
-        else {
+        } else {
             ax[Mmax][mpnmax - 1] = 0.;
         }
     }
@@ -57,7 +57,7 @@ void xcur() {
     for (int ll = 0; ll < llmax; ll++) {
         for (i = 0; i < Mmax; i++) {
             for (j = i; j < Mmax; j++) {
-                ax[i][j] += 2. * alph * eb[ll][i]* eb[ll][j];
+                ax[i][j] += 2. * alph * eb[ll][i] * eb[ll][j];
             }
             ax[i][Mmax] -= 2. * alph * eb[ll][i];
             fk[i] -= 2. * alph * eb[ll][i] * eb[ll][Mmax];
@@ -73,7 +73,7 @@ void xcur() {
     }
 
     for (j = 0; j < Nmax; j++) {
-        fk[mmaxp1 + j] = - bb[j][Mmax];
+        fk[mmaxp1 + j] = -bb[j][Mmax];
     }
 
     if (icops >= 2) {
@@ -90,7 +90,7 @@ void xcur() {
     for (i = 0; i < Mmax; i++) {
         int ki = i + 1;
         if ((ki + 1) <= Mmax) {
-            for (int k = ki; k < Mmax; k++ ) {
+            for (int k = ki; k < Mmax; k++) {
                 energy += cl[i][k] * fk[i] * fk[k];
             }
         }

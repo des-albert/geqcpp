@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "geq.h"
 
 using namespace std;
@@ -7,12 +8,12 @@ void compar() {
 
     double rel, dev, tot, ren;
 
-    if (icycle > 1) {
+    if (icycle >= 1) {
         rel = 0.;
         for (int j = 0; j < Mr; j++) {
-            tot = 0.5 * abs(g[j * Nz + naxis]) /2. + abs(com[j]);
-            dev = 0.5 * (abs(g[j * Nz + naxis]) - com[j]) / 2.;
-            ren = (dev/tot);
+            tot = 0.5 * fabs(g[j + Nz * naxis])  + 0.5 * fabs(com[j]);
+            dev = 0.5 * fabs(g[j + Nz * naxis] - com[j]);
+            ren = (dev / tot);
             if (ren > rel)
                 rel = ren;
         }
@@ -24,7 +25,7 @@ void compar() {
     }
 
     for (int j = 0; j < Mr; j++) {
-        com[j] = g[j * Nz + naxis];
+        com[j] = g[j + Nz * naxis];
     }
     idecis = 0;
 }

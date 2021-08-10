@@ -9,14 +9,27 @@
 using namespace std;
 
 extern void bndmat();
+
 extern void eqsil(double *);
+
 extern void splnco(double *);
+
 extern void startt();
+
 extern void compar();
+
 extern void xcur();
-extern double gfl(double, double, double, double );
+
+extern double gfl(double, double, double, double);
+
 extern void condit(double *, double, double, int, double **, int, int);
-double ** array2d(int, int);
+
+extern void saddle();
+
+extern void curf();
+
+double **array2d(int, int);
+
 void array2del(double **, int);
 
 int main() {
@@ -29,7 +42,7 @@ int main() {
 
     cout << "Garching Tokamak Equilibrium" << endl;
 
-    int Nexp = 3;
+    int Nexp = 6;
     Mr = 1 + (1 << Nexp);
     Nz = Mr;
     MN = Mr * Nz;
@@ -49,7 +62,7 @@ int main() {
     if (meshfg > 0) {
         Rmin = Rmpl - 32.0 * Apl / 20.0;
         Rmax = Rmpl + 32.0 * Apl / 20.0;
-        Zmin = Offset - 32.0 * (Offset + abs(Zxpsn)) / 20.0;
+        Zmin = Offset - 32.0 * (Offset + fabs(Zxpsn)) / 20.0;
         Zmax = Offset + 32.0 * (Apl * El) / 20.0;
     }
 
@@ -58,6 +71,9 @@ int main() {
     ip = new int[llp];
     jp = new int[llp];
     ityp = new int[Nmax];
+    pr = new double[Mr];
+    bt2 = new double[Mr];
+    cjt = new double[Mr];
 
     aux = array2d(llp, llp);
 
@@ -123,7 +139,7 @@ int main() {
         Conditions to be satisfied by resulting equilibrium
     */
 
-    elxp = abs(Offset - Zxpsn) / Apl;
+    elxp = fabs(Offset - Zxpsn) / Apl;
     trixp = (Rmpl - Rxpsn) / Apl;
 
     for (int j = 0; j < 3; j++) {
@@ -195,7 +211,7 @@ int main() {
         }
 
         for (int i = 0; i < icl; i++) {
-            if ( ! (((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) <= 0.) && ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) <= 0.)) ) {
+            if (!(((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) <= 0.) && ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) <= 0.))) {
                 for (int k = 0; k < Nz; k += Nm1) {
                     nof = k * Mr;
                     for (int j = 0; j < Mr; j++) {
@@ -207,7 +223,7 @@ int main() {
 
                 for (int k = 0; k < Nz; k++) {
                     nof = k * Mr;
-                    for (int j = 0; j < Mr; j+= Mm1) {
+                    for (int j = 0; j < Mr; j += Mm1) {
                         jn = nof + j;
                         expsi[jn] += Ex[i][kk] * gfl(R[j], Ra[i][kk], Z[k] - Za[i][kk], 0.);
 
@@ -220,7 +236,7 @@ int main() {
         eqsil(expsi);
 
         for (int i = 0; i < icl; i++) {
-            if ( ! (((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) > 0.) || ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) > 0.)) ) {
+            if (!(((Zmax - Za[i][kk]) * (Zmin - Za[i][kk]) > 0.) || ((Rmax - Ra[i][kk]) * (Rmin - Ra[i][kk]) > 0.))) {
                 for (int k = 0; k < Nz; k++) {
                     nof = k * Mr;
                     for (int j = 0; j < Mr; j++) {
@@ -256,14 +272,14 @@ int main() {
 
         for (int i = 0; i < icl; i++) {
             cl[Mmax][kk] += Ex[i][kk];
-            cl[kk][kk]  += Ex[i][kk]* Ex[i][kk] * 1.0e6 *(0.58 + log(Ra[i][kk]/Rl[i][kk])) / (2.0 * pi);
+            cl[kk][kk] += Ex[i][kk] * Ex[i][kk] * 1.0e6 * (0.58 + log(Ra[i][kk] / Rl[i][kk])) / (2.0 * pi);
         }
 
         for (int i = 0; i < icl; i++) {
             int ii = i + 2;
             if (ii <= ic[kk]) {
                 for (int j = ii - 1; j < icl; j++) {
-                    cl[kk][kk] += 2. * Ex[i][kk]*Ex[j][kk] * gfl(Ra[j][kk], Ra[i][kk], Za[j][kk] - Za[i][kk], 0.);
+                    cl[kk][kk] += 2. * Ex[i][kk] * Ex[j][kk] * gfl(Ra[j][kk], Ra[i][kk], Za[j][kk] - Za[i][kk], 0.);
                 }
             }
         }
@@ -274,7 +290,7 @@ int main() {
                 cl[kk][l] = 0.;
                 for (int i = 0; i < icl; i++) {
                     for (int j = 0; j < icm; j++) {
-                        cl[kk][l]  += Ex[i][kk]*Ex[j][l] * gfl(Ra[j][l], Ra[i][kk], Za[j][l] - Za[i][kk], 0.);
+                        cl[kk][l] += Ex[i][kk] * Ex[j][l] * gfl(Ra[j][l], Ra[i][kk], Za[j][l] - Za[i][kk], 0.);
                     }
                 }
             }
@@ -282,7 +298,7 @@ int main() {
     }
 
     fin >> icops >> value;
-    mpnmax  = Mmax + Nmax + 1;
+    mpnmax = Mmax + Nmax + 1;
     if (icops >= 1) {
         mpnmax += 1;
     }
@@ -295,7 +311,7 @@ int main() {
     raxis = R[jaxis];
     naxis = (int) floor(0.1 + (zaxis - Z[0]) / dz);
     zaxis = Z[naxis];
-    ndes = (int) floor(0.1 + (abs(zdes) - Z[0]) / dz);
+    ndes = (int) floor(0.1 + (fabs(zdes) - Z[0]) / dz);
     if (zdes > 0.) {
         zdes = Z[ndes];
     }
@@ -314,13 +330,14 @@ int main() {
     idecis = 0;
 
     while (icycle < 20) {
+        printf(" ==== Cycle number %2i  ====\n",icycle);
 
         eqsil(g);
 
         compar();
 
         for (int j = 0; j < MN; j++) {
-            fool[j] = 0;
+            fool[j] = 0.;
             expsi[j] = g[j];
         }
 
@@ -343,29 +360,46 @@ int main() {
             for (int j = 0; j < ic[i]; j++) {
                 curr = Ex[j][i] * fk[i];
                 xt1 += curr * curr;
-                xt2 += abs(curr);
-                xt3 += abs(curr * Ra[j][i]);
+                xt2 += fabs(curr);
+                xt3 += fabs(curr * Ra[j][i]);
             }
         }
 
         if (mprfg != 0) {
-            printf(" SIG(I**2) = %12.4f  SIG{ABS(I)) = %12.4f  SIG(ABS(RI)) = %12.4f \n",xt1,xt2,xt3);
+            printf(" SIG(I**2) = %12.4f  SIG{ABS(I)) = %12.4f  SIG(ABS(RI)) = %12.4f \n", xt1, xt2, xt3);
         }
 
         for (k = 0; k < Mmax; k++) {
-            for (int j = 1; j < MN; j++) {
+            for (int j = 0; j < MN; j++) {
                 fool[j] += fk[k] * psiext[j][k];
                 g[j] += fk[k] * psiext[j][k];
             }
         }
 
+        saddle();
+
+        if (mprfg != 0) {
+            printf(" Saddle point r = %12.5f  z = %12.5f \n", R[irsp], Z[izsp]);
+        }
+
+        if (idecis > 0)
+            goto L30;
+
+        curf();
+
         icycle += 1;
     }
+
+    L30:
+
 
     delete[] expsi;
     delete[] fool;
     delete[] g;
     delete[] fk;
+    delete[] pr;
+    delete[] bt2;
+    delete[] cjt;
 
     array2del(psiext, MN);
     array2del(bb, Nmax);
@@ -374,8 +408,8 @@ int main() {
 
 }
 
-double ** array2d(int m, int n) {
-    auto ** ptr = new double * [m];
+double **array2d(int m, int n) {
+    auto **ptr = new double *[m];
     for (int i = 0; i < m; i++) {
         ptr[i] = new double[n];
     }

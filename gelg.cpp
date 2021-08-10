@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cmath>
 
 using namespace std;
@@ -25,7 +24,7 @@ void gelg(double *rr, double **a, int m, int n, double eps, int ier) {
     */
 
     for (l = 0; l < mm; l++) {
-        tb = abs(ag[l]);
+        tb = fabs(ag[l]);
         if (tb > piv) {
             piv = tb;
             i = l + 1;
@@ -101,19 +100,19 @@ void gelg(double *rr, double **a, int m, int n, double eps, int ier) {
         lst = lst + 1;
         j = 0;
         for (ii = lst; ii <= lend; ii++) {
-            pivi = - ag[ii - 1];
+            pivi = -ag[ii - 1];
             ist = ii + m;
             j = j + 1;
             for (l = ist - 1; l < mm; l += m) {
                 ll = l - j;
                 ag[l] = ag[l] + pivi * ag[ll];
-                tb = abs(ag[l]);
-                if (tb > piv ) {
+                tb = fabs(ag[l]);
+                if (tb > piv) {
                     piv = tb;
                     i = l + 1;
                 }
             }
-            for (l = k - 1; l <nm; l += m) {
+            for (l = k - 1; l < nm; l += m) {
                 ll = l + j;
                 rr[ll] = rr[ll] + pivi * rr[l];
             }
@@ -121,7 +120,7 @@ void gelg(double *rr, double **a, int m, int n, double eps, int ier) {
         lst = lst + m;
     }
 
-Lback:
+    Lback:
 
     ist = mm + m;
     lst = m + 1;
@@ -131,10 +130,10 @@ Lback:
         ist = ist - lst;
         l = ist - m;
         l = (int) floor(ag[l - 1] + 0.5);
-        for (j = ii - 1; j < nm; j+= m) {
+        for (j = ii - 1; j < nm; j += m) {
             tb = rr[j];
             ll = j + 1;
-            for (k = ist - 1; k < mm; k+= m) {
+            for (k = ist - 1; k < mm; k += m) {
                 ll = ll + 1;
                 tb = tb - ag[k] * rr[ll - 1];
             }
@@ -143,9 +142,9 @@ Lback:
             rr[k] = tb;
         }
     }
-    delete [] ag;
+    delete[] ag;
     return;
-Lend:
+    Lend:
     ier = -1;
 
 }

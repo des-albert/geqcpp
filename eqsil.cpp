@@ -26,11 +26,11 @@ void eqsil(double *q) {
     for (int i = 0; i < llp; i++) {
         double sum = 0.;
         for (int l = 0; l < llp; l++) {
-            sum = sum +  aux[l][i] * qq[ip[l]];
+            sum = sum + aux[l][i] * qq[ip[l]];
         }
         q[jp[i]] = q[jp[i]] + sum;
         sum = 0.;
-    }       
+    }
 
     flux(q);
 
