@@ -28,6 +28,8 @@ extern void saddle();
 
 extern void curf();
 
+extern void plotit();
+
 double **array2d(int, int);
 
 void array2del(double **, int);
@@ -391,6 +393,8 @@ int main() {
     }
 
     L30:
+
+    plotit();
 
 
     delete[] expsi;

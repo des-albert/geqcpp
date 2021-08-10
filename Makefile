@@ -3,7 +3,8 @@ LD = g++
 
 CFLAGS = -g 
 
-SOURCES = geq.cpp bndmat.cpp eqsil.cpp flux.cpp intpol.cpp splnco.cpp startt.cpp compar.cpp xcur.cpp gelg.cpp saddle.cpp curf.cpp topol.cpp
+SOURCES = geq.cpp bndmat.cpp eqsil.cpp flux.cpp intpol.cpp splnco.cpp startt.cpp compar.cpp xcur.cpp gelg.cpp saddle.cpp \
+	curf.cpp topol.cpp plotit.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 
@@ -13,7 +14,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 
 
 gep: $(OBJECTS)
-	$(LD) -o geq $(OBJECTS)
+	$(LD) -o geq $(OBJECTS) -L/usr/local/dislin -ldiscpp
 all: gep
 clean: 
 	rm -f *.o geq
