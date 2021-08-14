@@ -1,14 +1,12 @@
 #include "geq.h"
 #include "/usr/local/dislin/include/discpp.h"
 
-using namespace std;
-
 
 void plotit() {
 
     Dislin d;
 
-    float plev; 
+    float plev;
     float rf[MN], rr[Mr], rz[Nz], cjr[Mr], p[Mr];
 
     for (int i = 0; i < Mr; i++) {
@@ -16,7 +14,7 @@ void plotit() {
         cjr[i] = (float) cjt[i];
         p[i] = (float) pr[i];
     }
-        for (int i = 0; i < Nz; i++) {
+    for (int i = 0; i < Nz; i++) {
         rz[i] = (float) Z[i];
     }
     for (int i = 0; i < Mr; i++) {
@@ -58,9 +56,9 @@ void plotit() {
     d.endgrf();
     d.disfin();
 
-/*
-    Current and Pressure profile
-*/
+    /*
+        Current and Pressure profile
+    */
 
     d.disini();
     d.complx();
@@ -78,3 +76,4 @@ void plotit() {
     d.curve(rr, p, Mr);
     d.disfin();
 }
+
